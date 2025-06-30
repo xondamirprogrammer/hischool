@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, User, Bot } from 'lucide-react';
+import { CHAT_RESPONSES, QUICK_QUESTIONS } from '../constants/chatResponses';
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,17 +15,41 @@ const ChatBot = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
 
-  const predefinedResponses = {
-    'courses': 'We offer English, Chinese, Korean, Arabic, and Mathematics courses. Would you like to know more about any specific language?',
-    'english': 'Our English courses include General English, Business English, and IELTS Preparation. Classes are available for all levels.',
-    'chinese': 'We teach Mandarin Chinese with HSK preparation levels 1-6. Perfect for beginners to advanced learners.',
-    'korean': 'Korean classes cover TOPIK levels 1-6, including K-culture integration for immersive learning.',
-    'arabic': 'We offer Modern Standard Arabic and Quranic Arabic courses for various proficiency levels.',
-    'math': 'Our Mathematics program covers algebra, geometry, calculus, and exam preparation.',
-    'schedule': 'Classes are available on weekdays and weekends. Morning, afternoon, and evening slots are available.',
-    'price': 'Course fees start from $150/month. We offer flexible payment plans and group discounts.',
-    'location': 'We have two branches: Nurafshon City and Yangiyol. Both locations offer the same high-quality education.',
-    'default': 'Thank you for your question! Our academic counselors will contact you within 24 hours for detailed information. You can also call us directly at +998 90 123 45 67.'
+  const findBestResponse = (userMessage: string): string => {
+    const lowercaseMessage = userMessage.toLowerCase();
+    const words = lowercaseMessage.split(/\s+/);
+    
+    // Calculate relevance score for each response key
+    const scores = Object.entries(CHAT_RESPONSES).map(([key, response]) => {
+      if (key === 'default') return { key, response, score: 0 };
+      
+      let score = 0;
+      
+      // Exact keyword match
+      if (words.includes(key)) {
+        score += 10;
+      }
+      
+      // Partial keyword match
+      if (lowercaseMessage.includes(key)) {
+        score += 5;
+      }
+      
+      // Word boundary match (more precise)
+      const regex = new RegExp(`\\b${key}\\b`, 'i');
+      if (regex.test(lowercaseMessage)) {
+        score += 15;
+      }
+      
+      return { key, response, score };
+    });
+    
+    // Find the highest scoring response
+    const bestMatch = scores.reduce((best, current) => 
+      current.score > best.score ? current : best
+    );
+    
+    return bestMatch.score > 0 ? bestMatch.response : CHAT_RESPONSES.default;
   };
 
   const handleSendMessage = () => {
@@ -39,16 +64,7 @@ const ChatBot = () => {
 
     setMessages(prev => [...prev, userMessage]);
 
-    // Find appropriate response
-    const lowercaseMessage = inputMessage.toLowerCase();
-    let response = predefinedResponses.default;
-
-    for (const [key, value] of Object.entries(predefinedResponses)) {
-      if (lowercaseMessage.includes(key)) {
-        response = value;
-        break;
-      }
-    }
+    const response = findBestResponse(inputMessage);
 
     setTimeout(() => {
       const botMessage = {
@@ -62,14 +78,6 @@ const ChatBot = () => {
 
     setInputMessage('');
   };
-
-  const quickQuestions = [
-    'What courses do you offer?',
-    'English course details',
-    'Class schedules',
-    'Course prices',
-    'Branch locations'
-  ];
 
   return (
     <>
@@ -168,7 +176,7 @@ const ChatBot = () => {
             {/* Quick Questions */}
             <div className="px-4 py-2 border-t border-gray-200">
               <div className="flex flex-wrap gap-2 mb-3">
-                {quickQuestions.slice(0, 3).map((question, index) => (
+                {QUICK_QUESTIONS.slice(0, 3).map((question, index) => (
                   <button
                     key={index}
                     onClick={() => setInputMessage(question)}

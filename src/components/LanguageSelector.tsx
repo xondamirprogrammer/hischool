@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '../constants/languages';
 
 const LanguageSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [selectedLanguage, setSelectedLanguage] = useState(DEFAULT_LANGUAGE);
 
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'uz', name: 'O\'zbekcha', flag: '🇺🇿' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'ko', name: '한국어', flag: '🇰🇷' },
-    { code: 'zh', name: '中文', flag: '🇨🇳' },
-    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  ];
-
-  const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
+  const currentLanguage = SUPPORTED_LANGUAGES.find(lang => lang.code === selectedLanguage);
 
   return (
     <div className="fixed top-24 right-4 z-40">
@@ -45,7 +37,7 @@ const LanguageSelector = () => {
               transition={{ duration: 0.2 }}
               className="absolute top-full right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 overflow-hidden min-w-48"
             >
-              {languages.map((language) => (
+              {SUPPORTED_LANGUAGES.map((language) => (
                 <motion.button
                   key={language.code}
                   onClick={() => {

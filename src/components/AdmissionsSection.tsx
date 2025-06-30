@@ -1,26 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import { Calendar, FileText, CheckCircle, Clock, DollarSign, Users } from 'lucide-react';
 
 const AdmissionsSection = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const elements = sectionRef.current?.querySelectorAll('.animate-on-scroll');
-    elements?.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
+  const [ref, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
 
   const admissionSteps = [
     {
@@ -71,9 +58,14 @@ const AdmissionsSection = () => {
   ];
 
   return (
-    <section id="admissions" ref={sectionRef} className="py-20 bg-gray-50">
+    <section id="admissions" ref={ref} className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 animate-on-scroll">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
             Admissions
           </h2>
@@ -81,15 +73,17 @@ const AdmissionsSection = () => {
             Join our community of learners and leaders. We welcome students who are 
             passionate about learning and ready to make a positive impact.
           </p>
-        </div>
+        </motion.div>
 
         {/* Admission Info Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {admissionInfo.map((info, index) => (
-            <div 
-              key={index} 
-              className="animate-on-scroll bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition-shadow duration-300"
-              style={{ animationDelay: `${index * 100}ms` }}
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="bg-white p-8 rounded-2xl shadow-lg text-center hover:shadow-xl transition-shadow duration-300"
             >
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <info.icon className="w-8 h-8 text-blue-600" />
@@ -97,19 +91,30 @@ const AdmissionsSection = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{info.title}</h3>
               <div className="text-2xl font-bold text-blue-600 mb-2">{info.value}</div>
               <p className="text-gray-600">{info.description}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Application Process */}
-        <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl animate-on-scroll">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl"
+        >
           <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">
             Application Process
           </h3>
           
           <div className="grid lg:grid-cols-4 gap-8">
             {admissionSteps.map((step, index) => (
-              <div key={index} className="relative">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                className="relative"
+              >
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full text-xl font-bold mb-4">
                     {step.step}
@@ -125,14 +130,18 @@ const AdmissionsSection = () => {
                 {index < admissionSteps.length - 1 && (
                   <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-blue-200 transform -translate-y-1/2"></div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Requirements */}
         <div className="grid lg:grid-cols-2 gap-12 mt-16">
-          <div className="animate-on-scroll">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Admission Requirements</h3>
             <div className="space-y-4">
               {[
@@ -149,9 +158,13 @@ const AdmissionsSection = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
           
-          <div className="animate-on-scroll">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.8 }}
+          >
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Financial Aid</h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
               We believe that financial circumstances should never be a barrier to quality education. 
@@ -170,11 +183,16 @@ const AdmissionsSection = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-16 animate-on-scroll">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="text-center mt-16"
+        >
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-8 lg:p-12 text-white">
             <h3 className="text-3xl font-bold mb-4">Ready to Apply?</h3>
             <p className="text-xl mb-8 opacity-90">
@@ -189,7 +207,7 @@ const AdmissionsSection = () => {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

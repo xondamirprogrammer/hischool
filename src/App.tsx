@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -20,19 +20,8 @@ import ParticleBackground from './components/ParticleBackground';
 import LanguageSelector from './components/LanguageSelector';
 import ChatBot from './components/ChatBot';
 import BackToTop from './components/BackToTop';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 function App() {
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      easing: 'ease-out-cubic',
-      once: true,
-      offset: 100
-    });
-  }, []);
-
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Suspense fallback={<LoadingScreen />}>

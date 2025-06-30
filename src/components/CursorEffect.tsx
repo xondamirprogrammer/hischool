@@ -1,35 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
 const CursorEffect = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
+  const updateMousePosition = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const handleMouseOver = useCallback((e: Event) => {
+    const target = e.target as HTMLElement;
+    if (target.matches('button, a, input, textarea, select, [role="button"]')) {
+      setIsHovering(true);
+    }
+  }, []);
+
+  const handleMouseOut = useCallback((e: Event) => {
+    const target = e.target as HTMLElement;
+    if (target.matches('button, a, input, textarea, select, [role="button"]')) {
+      setIsHovering(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
-
-    window.addEventListener('mousemove', updateMousePosition);
-    
-    // Add hover effects to interactive elements
-    const interactiveElements = document.querySelectorAll('button, a, input, textarea, select');
-    interactiveElements.forEach(el => {
-      el.addEventListener('mouseenter', handleMouseEnter);
-      el.addEventListener('mouseleave', handleMouseLeave);
-    });
+    // Use event delegation for better performance
+    document.body.addEventListener('mousemove', updateMousePosition, { passive: true });
+    document.body.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.body.addEventListener('mouseout', handleMouseOut, { passive: true });
 
     return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      interactiveElements.forEach(el => {
-        el.removeEventListener('mouseenter', handleMouseEnter);
-        el.removeEventListener('mouseleave', handleMouseLeave);
-      });
+      document.body.removeEventListener('mousemove', updateMousePosition);
+      document.body.removeEventListener('mouseover', handleMouseOver);
+      document.body.removeEventListener('mouseout', handleMouseOut);
     };
-  }, []);
+  }, [updateMousePosition, handleMouseOver, handleMouseOut]);
 
   return (
     <>
